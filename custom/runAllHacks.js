@@ -16,11 +16,12 @@ export async function main(ns) {
     }
     const host = args._[0];
     const script = "basic_hack.js";
-    const servers = list_servers(ns).filter(s => ns.hasRootAccess(s)).concat(['home']);
+    const servers = list_servers(ns).filter(s => ns.hasRootAccess(s)).filter(s => !s.startsWith("auto_serv")).concat(['home']);
     for (const server of servers) {
         ns.scriptKill(script, server);
-        const threads = Math.floor((ns.getServerMaxRam(server) - ns.getServerUsedRam(server)) / ns.getScriptRam(script));
+        var threads = Math.floor((ns.getServerMaxRam(server) - ns.getServerUsedRam(server)) / ns.getScriptRam(script));
         if (threads === 0) continue;
+        if (server === "home") threads = threads / 2;
         ns.tprint(`Attacking '${host}' from '${server}' with ${threads} threads...`);
         await ns.scp(script, ns.getHostname(), server);
         ns.exec(script, server, threads, host);
