@@ -8,20 +8,33 @@ export async function main(ns) {
         ns.tprint(`> run ${ns.getScriptName()}`);
         return;
     }
-    
-    const doc = document; // This is expensive! (25GB RAM) Perhaps there's a way around it? ;)
-    const hook0 = doc.getElementById('overview-extra-hook-0');
-    const hook1 = doc.getElementById('overview-extra-hook-1');
+
+    const hook0 = eval("document.getElementById('overview-extra-hook-0')");
+    const hook1 = eval("document.getElementById('overview-extra-hook-1')");
     while (true) {
         try {
             const headers = []
             const values = [];
             // Add script income per second
             headers.push("ScrInc");
-            values.push(ns.getScriptIncome()[0].toPrecision(5) + '/sec');
+            var income = ns.getScriptIncome()[0];
+            var incomeSuffix = '';
+            while (income / 1000 > 1) {
+                incomeSuffix += 'k';
+                income /= 1000;
+            }
+            values.push(income.toFixed(2) + incomeSuffix + '/sec');
             // Add script exp gain rate per second
             headers.push("ScrExp");
-            values.push(ns.getScriptExpGain().toPrecision(5) + '/sec');
+            var exp = ns.getScriptExpGain();
+            var expSuffix = '';
+            while (exp / 1000 > 1) {
+                expSuffix += 'k';
+                exp /= 1000;
+            }
+            values.push(exp.toFixed(2) + expSuffix + '/sec');
+            headers.push("Shares");
+            values.push('x' + ns.getSharePower().toFixed(2));
             // TODO: Add more neat stuff
 
             // Now drop it into the placeholder elements
